@@ -20,7 +20,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
@@ -29,10 +28,6 @@ import com.tvt.common.ImageCommonHandle;
 import jnafilechooser.api.JnaFileChooser;
 
 public class Form_AccessPixelValueDemo extends JFrame {
-
-	static {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	}
 
 	private static final long serialVersionUID = 1L;
 	
@@ -58,7 +53,7 @@ public class Form_AccessPixelValueDemo extends JFrame {
 	}
 
 	private void initComponent() {
-		this.setTitle("Excersise 1");
+		this.setTitle("Access Pixel Value Demo");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setBounds(100, 100, 1439, 737);
 		this.setLocationRelativeTo(null);
@@ -130,6 +125,7 @@ public class Form_AccessPixelValueDemo extends JFrame {
 		btnLoadImage_Click();
 		listImage_ValueChanged();
 		btnClear_Click();
+		
 	}
 	
 	private void btnClear_Click()
@@ -148,7 +144,7 @@ public class Form_AccessPixelValueDemo extends JFrame {
 				JnaFileChooser fileChooser = new JnaFileChooser();
 				fileChooser.setMultiSelectionEnabled(true);
 				fileChooser.setCurrentDirectory("D:\\Tan\\Sample_Data\\");
-				fileChooser.addFilter("Image Files", "gif", "jpg", "png", "gif", "tif", "bmp");
+				fileChooser.addFilter("Image Files", "gif", "jpg", "png", "webp", "tif", "bmp");
 				fileChooser.addFilter("All files", "*.*");
 
 				if (fileChooser.showOpenDialog(getOwner())) {
@@ -184,7 +180,7 @@ public class Form_AccessPixelValueDemo extends JFrame {
 		}
 
 		Mat output = new Mat(input.rows(), input.cols(), input.type());
-
+		
 		int rows = input.rows();
 		int cols = input.cols();
 		int channels = input.channels();

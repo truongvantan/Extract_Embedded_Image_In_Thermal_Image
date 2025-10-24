@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.opencv.core.Mat;
 import org.opencv.highgui.HighGui;
@@ -25,17 +26,27 @@ public class ImageCommonHandle {
 
 	public void loadImageToLabel(String imagePath, JLabel labelLoadImage, JPanel panelLoadImage) {
 		BufferedImage bufferedImage = null;
+		ImageIcon imageIcon = null;;
+		
 		try {
 			bufferedImage = ImageIO.read(new File(imagePath));
 		} catch (IOException e) {
 			e.printStackTrace();
-			bufferedImage = new BufferedImage(0, 0, 0);
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
+			imageIcon = (ImageIcon)UIManager.getIcon("OptionPane.errorIcon");
+//			return;
 		}
 		
-		ImageIcon imageIcon = new ImageIcon(bufferedImage);
+		try {
+			imageIcon = new ImageIcon(bufferedImage);
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
+			imageIcon = (ImageIcon)UIManager.getIcon("OptionPane.errorIcon");
+		}
 
 
-		if (imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
+		if (imageIcon == null || imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
 			JOptionPane.showMessageDialog(null, "Cannot open image: " + imagePath, "WARNING", JOptionPane.WARNING_MESSAGE);
 		} else {
 			imageIcon.setImage(imageIcon.getImage().getScaledInstance(panelLoadImage.getWidth(), panelLoadImage.getHeight(), Image.SCALE_SMOOTH));

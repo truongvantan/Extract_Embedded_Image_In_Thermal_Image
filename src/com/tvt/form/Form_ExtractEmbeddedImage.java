@@ -23,6 +23,8 @@ import javax.swing.event.ListSelectionListener;
 import com.tvt.common.ImageCommonHandle;
 
 import jnafilechooser.api.JnaFileChooser;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseEvent;
 
 public class Form_ExtractEmbeddedImage extends JFrame {
 
@@ -37,20 +39,25 @@ public class Form_ExtractEmbeddedImage extends JFrame {
 	private DefaultListModel<String> listModel;
 	private JScrollPane scrollPane;
 	private JPanel panelInputImage;
-	private JLabel lbInputImage;
+	private JLabel lbThermalImage;
 	private JLabel lbLoadInputImage;
 	private JPanel panelOutputImage;
 	private JLabel lbLoadOutputImage;
 	private JLabel lbOutputImage;
+	private JLabel lbLocationThermalImage;
+	private JLabel lbLocationThermalImageValue;
+	private JLabel lbLocationEmbeddedImage;
+	private JLabel lbLocationEmbeddedImageValue;
+	private JnaFileChooser fileChooser;
 	
 	public Form_ExtractEmbeddedImage() {
 		initComponent();
 	}
 	
 	private void initComponent() {
-		this.setTitle("Excersise 2");
+		this.setTitle("Extract Embedded Image");
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setBounds(100, 100, 1439, 737);
+		this.setBounds(100, 100, 1822, 737);
 		this.setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
@@ -66,7 +73,7 @@ public class Form_ExtractEmbeddedImage extends JFrame {
 		listModel = new DefaultListModel<>();
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(30, 62, 327, 433);
+		scrollPane.setBounds(30, 62, 327, 480);
 		contentPane.add(scrollPane);
 
 		listImage = new JList<>(listModel);
@@ -76,33 +83,63 @@ public class Form_ExtractEmbeddedImage extends JFrame {
 
 		panelInputImage = new JPanel();
 		panelInputImage.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panelInputImage.setBounds(439, 62, 424, 433);
+		panelInputImage.setBounds(439, 62, 640, 480);
 		contentPane.add(panelInputImage);
 		panelInputImage.setLayout(null);
 
 		lbLoadInputImage = new JLabel("");
-		lbLoadInputImage.setBounds(0, 0, 424, 433);
+		
+		lbLoadInputImage.setBounds(0, 0, 640, 480);
 		panelInputImage.add(lbLoadInputImage);
 
-		lbInputImage = new JLabel("Input Image");
-		lbInputImage.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lbInputImage.setBounds(439, 24, 95, 14);
-		contentPane.add(lbInputImage);
+		lbThermalImage = new JLabel("Thermal Image");
+		lbThermalImage.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lbThermalImage.setBounds(439, 24, 95, 14);
+		contentPane.add(lbThermalImage);
 
 		panelOutputImage = new JPanel();
 		panelOutputImage.setLayout(null);
 		panelOutputImage.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panelOutputImage.setBounds(923, 62, 424, 433);
+		panelOutputImage.setBounds(1152, 63, 640, 480);
 		contentPane.add(panelOutputImage);
 
 		lbLoadOutputImage = new JLabel("");
-		lbLoadOutputImage.setBounds(0, 0, 424, 433);
+		lbLoadOutputImage.setBounds(0, 0, 640, 480);
 		panelOutputImage.add(lbLoadOutputImage);
 
-		lbOutputImage = new JLabel("Output Image");
+		lbOutputImage = new JLabel("Embedded Image");
 		lbOutputImage.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lbOutputImage.setBounds(923, 23, 95, 14);
+		lbOutputImage.setBounds(1152, 23, 119, 14);
 		contentPane.add(lbOutputImage);
+		
+		lbLocationThermalImage = new JLabel("Location:");
+		lbLocationThermalImage.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lbLocationThermalImage.setBounds(439, 564, 63, 14);
+		contentPane.add(lbLocationThermalImage);
+		
+		lbLocationThermalImageValue = new JLabel("");
+		lbLocationThermalImageValue.setVisible(false);
+		lbLocationThermalImageValue.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lbLocationThermalImageValue.setBounds(512, 565, 78, 14);
+		contentPane.add(lbLocationThermalImageValue);
+		
+		lbLocationEmbeddedImage = new JLabel("Location:");
+		lbLocationEmbeddedImage.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lbLocationEmbeddedImage.setBounds(1152, 565, 63, 14);
+		contentPane.add(lbLocationEmbeddedImage);
+		
+		lbLocationEmbeddedImageValue = new JLabel("");
+		lbLocationEmbeddedImageValue.setVisible(false);
+		lbLocationEmbeddedImageValue.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lbLocationEmbeddedImageValue.setBounds(1225, 565, 95, 14);
+		contentPane.add(lbLocationEmbeddedImageValue);
+		
+		// file chooser
+		fileChooser = new JnaFileChooser();
+		fileChooser.setMultiSelectionEnabled(true);
+		fileChooser.setCurrentDirectory("D:\\Tan\\Sample_Data\\");
+		fileChooser.addFilter("Image Files", "gif", "jpg", "png", "webp", "tif", "bmp");
+		fileChooser.addFilter("All files", "*.*");
 		
 		handleEvent();
 	}
@@ -110,18 +147,39 @@ public class Form_ExtractEmbeddedImage extends JFrame {
 	private void handleEvent() {
 		btnLoadImage_Click();
 		listImage_ValueChanged();
+		lbLoadInputImage_MouseMoved();
+		lbLoadOutputImage_MouseMoved();
 	}
 	
+
+	private void lbLoadOutputImage_MouseMoved() {
+		lbLoadOutputImage.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y).append(")").toString();
+				lbLocationEmbeddedImageValue.setText(locationValue);
+			}
+		});
+	}
+
+	private void lbLoadInputImage_MouseMoved() {
+		lbLoadInputImage.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				String locationValue = new StringBuffer("").append("(").append(x).append(",").append(y).append(")").toString();
+				
+				lbLocationThermalImageValue.setText(locationValue);
+			}
+		});
+	}
 
 	private void btnLoadImage_Click() {
 		btnLoadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JnaFileChooser fileChooser = new JnaFileChooser();
-				fileChooser.setMultiSelectionEnabled(true);
-				fileChooser.setCurrentDirectory("D:\\Tan\\Sample_Data\\");
-				fileChooser.addFilter("Image Files", "gif", "jpg", "png", "gif", "tif", "bmp");
-				fileChooser.addFilter("All files", "*.*");
-
 				if (fileChooser.showOpenDialog(getOwner())) {
 					File[] selectedFiles = fileChooser.getSelectedFiles();
 					for (File file : selectedFiles) {
@@ -139,36 +197,74 @@ public class Form_ExtractEmbeddedImage extends JFrame {
 
 				// load image to picturebox
 				imageCommonHandle.loadImageToLabel(pathImageSelected, lbLoadInputImage, panelInputImage);
-
-				// 
+				lbLocationThermalImageValue.setVisible(true);
+				// extract metadata of thermal image
+				extractMetadataImage(pathImageSelected);
+				
+				// extract embedded image of thermal image
 				extractEmbeddedImage(pathImageSelected);
 			}
 		});
 	}
 
-	private void extractEmbeddedImage(String pathImageSelected) {
-		File outputDir = new File(OUTPUT_EMBEDDED_IMAGE_FOLDER);
-        if (!outputDir.exists()) {
-        	outputDir.mkdirs();
-        }
+	private void extractMetadataImage(String pathImageSelected) {
+		createOuputDirectory();
         
         // Format output file name
         File inputFile = new File(pathImageSelected);
         String baseName = inputFile.getName().replaceFirst("[.][^.]+$", ""); // remove extension
-        String outputPath = OUTPUT_EMBEDDED_IMAGE_FOLDER + "\\" + baseName + "_embedded.png";
+        String thermalImageMetaDataPath = OUTPUT_EMBEDDED_IMAGE_FOLDER + "\\" + baseName + "_metadata.txt";
         
         /**
-         * Run ExifTool to extract embedded image
-         * Example: exiftool -b -EmbeddedImage input.jpg > output.png
+         * Extract Metadata of thermal image
+         * Example command line: exiftool <filename.jpg>
          * */
-        ProcessBuilder pb = new ProcessBuilder(
+        ProcessBuilder processBuilder1 = new ProcessBuilder(
+        		"exiftool", pathImageSelected
+        );
+        
+        try {
+			processBuilder1.redirectOutput(new File(thermalImageMetaDataPath));
+			Process process1 = processBuilder1.start();
+			process1.waitFor();
+			JOptionPane.showMessageDialog(null, "Extract metadata successfully: " + thermalImageMetaDataPath, "INFO", JOptionPane.INFORMATION_MESSAGE);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Cannot extract metadata image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Cannot extract metadata image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	private void createOuputDirectory() {
+		File outputDir = new File(OUTPUT_EMBEDDED_IMAGE_FOLDER);
+        if (!outputDir.exists()) {
+        	outputDir.mkdirs();
+        }
+	}
+
+	private void extractEmbeddedImage(String pathImageSelected) {
+		createOuputDirectory();
+        
+        // Format output file name
+        File inputFile = new File(pathImageSelected);
+        String baseName = inputFile.getName().replaceFirst("[.][^.]+$", ""); // remove extension
+        String embeddedImagePath = OUTPUT_EMBEDDED_IMAGE_FOLDER + "\\" + baseName + "_embedded.png";
+  
+        /**
+         * Run ExifTool to extract embedded image
+         * Example command line: exiftool -b -EmbeddedImage input.jpg > output.png
+         * */
+        ProcessBuilder pb2 = new ProcessBuilder(
                 "exiftool", "-b", "-EmbeddedImage", pathImageSelected
         );
         
         try {
-			pb.redirectOutput(new File(outputPath));
-			Process process = pb.start();
+        	pb2.redirectOutput(new File(embeddedImagePath));
+			Process process = pb2.start();
 			process.waitFor();
+			JOptionPane.showMessageDialog(null, "Extract embedded image successfully: " + embeddedImagePath, "INFO", JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
@@ -179,15 +275,16 @@ public class Form_ExtractEmbeddedImage extends JFrame {
         
         // Show extracted embedded image
         try {
-			File embeddedFile = new File(outputPath);
+			File embeddedFile = new File(embeddedImagePath);
 			
 			if (embeddedFile.exists() && embeddedFile.length() > 0) {
-				imageCommonHandle.loadImageToLabel(outputPath, lbLoadOutputImage, panelOutputImage);
+				imageCommonHandle.loadImageToLabel(embeddedImagePath, lbLoadOutputImage, panelOutputImage);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Cannot extract embedded image: " + pathImageSelected, "WARNING", JOptionPane.WARNING_MESSAGE);
 		}
+        lbLocationEmbeddedImageValue.setVisible(true);
 	}
 
 }

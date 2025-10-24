@@ -4,10 +4,17 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
+import org.opencv.core.Core;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class MainForm extends JFrame {
+	
+	static {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+	}
 
 	private static final long serialVersionUID = 1L;
 	
@@ -15,6 +22,7 @@ public class MainForm extends JFrame {
 	private JMenu mnNewMenu;
 	private JMenuItem menuItemAccessPixelValueDemo;
 	private JMenuItem menuItemExtractEmbeddedImage;
+	private JMenuItem menuItemConvertImageExtension;
 	
 	
 	public MainForm() {
@@ -40,12 +48,25 @@ public class MainForm extends JFrame {
 		menuItemExtractEmbeddedImage = new JMenuItem("Extract Embedded Image");
 		mnNewMenu.add(menuItemExtractEmbeddedImage);
 		
+		menuItemConvertImageExtension = new JMenuItem("Convert Image Extension");
+		mnNewMenu.add(menuItemConvertImageExtension);
+		
 		handleEvent();
 	}
 	
 	private void handleEvent() {
 		menuItemAccessPixelValueDemo_Click();
 		menuItemExtractEmbeddedImage_Click();
+		menuItemConvertImageExtension_Click();
+	}
+
+	private void menuItemConvertImageExtension_Click() {
+		menuItemConvertImageExtension.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame form = new Form_ConvertImageExtension();
+				form.setVisible(true);
+			}
+		});
 	}
 
 	private void menuItemAccessPixelValueDemo_Click() {
